@@ -4,7 +4,8 @@ class CatChat {
       this.inputElement = document.getElementById("chat-input")
       this.sendButton = document.getElementById("send-btn")
   
-      this.apiUrl = "/api/chat"
+      this.apiUrl = "https://chatserver-te21.onrender.com/api/chat"
+
       this.apiKey = "wOXvhtYLiFuxezWqdRlR:bUGDDsaBJqsVYhFOSibD"
       this.appId = "84c87cc1"
   
