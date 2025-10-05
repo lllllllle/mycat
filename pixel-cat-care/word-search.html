@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>找单词</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <button class="pixel-btn" onclick="window.location.href='index.html'">← 返回</button>
+            <h1>🔤 找单词游戏</h1>
+        </div>
+
+        <div class="word-search-container">
+            <div class="word-search-info">
+                <div class="timer-display">
+                    <span class="timer-label">⏱️ 时间:</span>
+                    <span id="timer">00:00</span>
+                </div>
+                <button id="start-word-game-btn" class="pixel-btn">开始游戏</button>
+                <button id="reset-word-game-btn" class="pixel-btn secondary">重置</button>
+            </div>
+
+            <div class="word-search-main">
+                <div class="word-list-panel">
+                    <h3>待找单词</h3>
+                    <div id="word-list" class="word-list"></div>
+                </div>
+
+                <div class="grid-panel">
+                    <div id="letter-grid" class="letter-grid"></div>
+                </div>
+            </div>
+
+            <div class="word-search-instructions">
+                <h3>游戏规则</h3>
+                <ul>
+                    <li>在10x10字母矩阵中找到所有单词</li>
+                    <li>单词可能横向或纵向排列</li>
+                    <li>用鼠标拖动选择字母</li>
+                    <li>找到单词后会自动高亮</li>
+                    <li>找到所有单词即可获胜</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="word-search.js"></script>
+</body>
+</html>

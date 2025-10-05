@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猫咪养成</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 初始化界面 -->
+    <div id="init-screen" class="screen">
+        <div class="init-container">
+            <h1 class="pixel-title">欢迎来到猫咪世界</h1>
+            <div class="cat-preview">
+                <canvas id="preview-canvas" width="200" height="200"></canvas>
+            </div>
+            <div class="init-form">
+                <label class="pixel-label">选择花色：</label>
+                <div class="color-options">
+                    <button class="color-btn active" data-color="black">黑猫</button>
+                    <button class="color-btn" data-color="white">白猫</button>
+                    <button class="color-btn" data-color="siamese">暹罗</button>
+                </div>
+                <label class="pixel-label">给猫咪命名：</label>
+                <input type="text" id="cat-name-input" class="pixel-input" maxlength="10" placeholder="输入名字">
+                <button id="start-btn" class="pixel-btn">开始养猫</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <div id="main-screen" class="screen hidden">
+        <div class="header">
+            <div class="date-info">
+                <div class="current-date" id="current-date"></div>
+                <div class="visit-stats">
+                    <span id="total-days">累计访问: 1天</span>
+                    <span id="last-visit">上次访问: 刚刚</span>
+                </div>
+            </div>
+            <button id="settings-btn" class="icon-btn">⚙️</button>
+        </div>
+
+        <div class="main-content">
+            <div class="cat-area">
+                <div class="speech-bubble" id="speech-bubble">
+                    <p id="cat-speech"></p>
+                </div>
+                <canvas id="cat-canvas" width="300" height="300"></canvas>
+                <div class="cat-name" id="cat-name-display"></div>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stat-item">
+                    <span class="stat-icon">🍖</span>
+                    <span class="stat-value" id="hunger-value">100</span>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="hunger-bar"></div>
+                    </div>
+                    
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">💧</span>
+                    <span class="stat-value" id="thirst-value">100</span>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="thirst-bar"></div>
+                    </div>
+                    
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">✨</span>
+                    <span class="stat-value" id="clean-value">100</span>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="clean-bar"></div>
+                    </div>
+                    
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">😊</span>
+                    <span class="stat-value" id="mood-value">100</span>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="mood-bar"></div>
+                    </div>
+                    
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">❤️</span>
+                    <span class="stat-value" id="intimacy-value">100</span>
+                    <div class="stat-bar">
+                        <div class="stat-fill" id="intimacy-bar"></div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="action-panel">
+                <div class="action-group">
+                    <h3>喂食</h3>
+                    <button class="action-btn" data-action="feed-fish">🎂 蛋糕</button>
+                    <button class="action-btn" data-action="feed-food">🍚 猫粮</button>
+                    <button class="action-btn" data-action="feed-can">🥫 罐头</button>
+                </div>
+                <div class="action-group">
+                    <h3>照顾</h3>
+                    <button class="action-btn" data-action="water">💧 加水</button>
+                    <button class="action-btn" data-action="bath">🛁 洗澡</button>
+                    <button class="action-btn" data-action="play">🎾 逗猫</button>
+                </div>
+            </div>
+
+            <div class="interaction-log">
+                <h3>互动记录</h3>
+                <div id="log-content" class="log-content"></div>
+            </div>
+        </div>
+
+        <div class="nav-bar">
+            <button class="nav-btn" data-page="notes">📝 留言板</button>
+            <button class="nav-btn" data-page="tasks">✅ 计划表</button>
+            <button class="nav-btn" data-page="diary">📔 日记本</button>
+            <button class="nav-btn" data-page="catch-cat">🐱 抓小猫</button>
+            <button class="nav-btn" data-page="word-search">🔤 找单词</button>
+            <button class="nav-btn" data-page="chat">💬 聊天</button>
+        </div>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>设置</h2>
+            <div class="settings-form">
+                <label>猫咪名字：</label>
+                <input type="text" id="rename-input" class="pixel-input" maxlength="10">
+                <p class="hint" id="rename-hint"></p>
+                
+                <label>更换花色：</label>
+                <div class="color-options">
+                    <button class="color-btn" data-color="black">黑猫</button>
+                    <button class="color-btn" data-color="white">白猫</button>
+                    <button class="color-btn" data-color="siamese">暹罗</button>
+                </div>
+                <p class="hint" id="color-hint"></p>
+            </div>
+            <div class="modal-actions">
+                <button id="save-settings-btn" class="pixel-btn">保存</button>
+                <button id="close-settings-btn" class="pixel-btn secondary">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="cat-canvas.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

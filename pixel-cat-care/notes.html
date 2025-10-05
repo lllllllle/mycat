@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言板</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <button id="back-btn" class="pixel-btn secondary">← 返回</button>
+            <h1>📝 留言板</h1>
+        </div>
+
+        <div class="notes-container">
+            <div class="add-note-section">
+                <textarea id="note-input" class="pixel-textarea" placeholder="写下你的留言..."></textarea>
+                <button id="add-note-btn" class="pixel-btn">添加便签</button>
+            </div>
+
+            <div id="notes-grid" class="notes-grid"></div>
+        </div>
+    </div>
+
+    <script src="notes.js"></script>
+</body>
+</html>

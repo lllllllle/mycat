@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计划表</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <button id="back-btn" class="pixel-btn secondary">← 返回</button>
+            <h1>✅ 今日计划</h1>
+        </div>
+
+        <div class="tasks-container">
+            <div class="add-task-section">
+                <input type="text" id="task-input" class="pixel-input" placeholder="输入任务...">
+                <select id="priority-select" class="pixel-select">
+                    <option value="low">普通</option>
+                    <option value="medium">重要</option>
+                    <option value="high">紧急</option>
+                </select>
+                <button id="add-task-btn" class="pixel-btn" style="margin-top:0px !important">添加任务</button>
+            </div>
+
+            <div id="tasks-list" class="tasks-list"></div>
+        </div>
+    </div>
+
+    <script src="tasks.js"></script>
+</body>
+</html>

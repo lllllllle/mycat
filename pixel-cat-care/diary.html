@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日记本</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <button id="back-btn" class="pixel-btn secondary">← 返回</button>
+            <h1>📔 日记本</h1>
+        </div>
+
+        <div class="diary-container">
+            <div class="diary-editor">
+                <div class="diary-date">
+                    <input type="date" id="diary-date" class="pixel-input">
+                </div>
+                <div class="mood-selector">
+                    <label>今天的心情：</label>
+                    <div class="mood-options">
+                        <button class="mood-btn" data-mood="happy">😊</button>
+                        <button class="mood-btn" data-mood="sad">😢</button>
+                        <button class="mood-btn" data-mood="excited">🤩</button>
+                        <button class="mood-btn" data-mood="tired">😴</button>
+                        <button class="mood-btn" data-mood="angry">😠</button>
+                        <button class="mood-btn" data-mood="calm">😌</button>
+                    </div>
+                </div>
+                <textarea id="diary-content" class="pixel-textarea diary-textarea" placeholder="记录今天的故事..."></textarea>
+                <button id="save-diary-btn" class="pixel-btn">保存日记</button>
+            </div>
+
+            <div class="diary-list">
+                <h3>历史日记</h3>
+                <div id="diary-entries" class="diary-entries"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="diary.js"></script>
+</body>
+</html>

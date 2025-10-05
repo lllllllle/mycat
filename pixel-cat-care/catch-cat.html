@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抓住小猫</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <button class="pixel-btn" onclick="window.location.href='index.html'">← 返回</button>
+            <h1>🐱 抓住小猫</h1>
+        </div>
+
+        <div class="game-container">
+            <div class="game-info">
+                <div class="game-status">
+                    <span id="game-status-text">点击开始游戏</span>
+                </div>
+                <div class="game-controls">
+                    <button id="start-game-btn" class="pixel-btn">开始游戏</button>
+                    <button id="reset-game-btn" class="pixel-btn secondary">重置</button>
+                </div>
+                <div class="game-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">已围栏:</span>
+                        <span id="fence-count">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">小猫移动:</span>
+                        <span id="cat-moves">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-board-wrapper">
+                <canvas id="game-canvas" width="600" height="600"></canvas>
+            </div>
+
+            <div class="game-instructions">
+                <h3>游戏规则</h3>
+                <ul>
+                    <li>小猫🐱从中心开始</li>
+                    <li>点击格子设置围栏（变成粉色）</li>
+                    <li>每次你点击，小猫会移动一格</li>
+                    <li>阻止小猫逃到边缘！</li>
+                    <li>小猫到达边缘 = 游戏失败</li>
+                    <li>完全围住小猫 = 游戏胜利</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="catch-cat.js"></script>
+</body>
+</html>

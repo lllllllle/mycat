@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>格子冒险游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: white;
+        }
+
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .bubble-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .bubble-info.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 50px);
+            grid-template-rows: repeat(10, 50px);
+            gap: 1px;
+            background: #ddd;
+            border: 3px solid #333;
+            position: relative;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            background: white;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .player {
+            width: 40px;
+            height: 40px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .player::before {
+            content: '😊';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+        }
+
+        /* 场景1: 卧室 */
+        .bed {
+            background: #8B4513 !important;
+        }
+
+        .door {
+            background: #000 !important;
+        }
+
+        /* 场景2: 森林 */
+        .forest-light {
+            background: #90EE90 !important;
+        }
+
+        .forest-dark {
+            background: #7CCD7C !important;
+        }
+
+        .hole {
+            position: relative;
+        }
+
+        .hole::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #000;
+            border-radius: 50%;
+        }
+
+        .tree {
+            position: relative;
+        }
+
+        .tree::after {
+            content: '🌲';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+        }
+
+        /* 场景3: 海洋 */
+        .ocean {
+            background: #4169E1 !important;
+        }
+
+        .bubble {
+            position: relative;
+        }
+
+        .bubble::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 35px;
+            height: 35px;
+            border: 3px solid white;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 场景4: 登山 */
+        .mountain {
+            background: #D2B48C !important;
+        }
+
+        .mountain-night {
+            background: #000 !important;
+        }
+
+        .obstacle {
+            background: #696969 !important;
+        }
+
+        .obstacle::after {
+            content: '🪨';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+        }
+
+        .obstacle.night {
+            background: #000 !important;
+        }
+
+        .obstacle.night::after {
+            color: #000;
+        }
+
+        .ghost {
+            position: relative;
+        }
+
+        .ghost::after {
+            content: '👻';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+        }
+
+        .ghost.night::after {
+            filter: brightness(0);
+        }
+
+        .exit {
+            background: #FFD700 !important;
+        }
+
+        .exit::after {
+            content: '🚪';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+        }
+
+        /* 提示窗口 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .modal-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .modal-btn:hover {
+            background: #5568d3;
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 结局场景样式 */
+        .ending-scene {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: white;
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .ending-scene.active {
+            display: flex;
+        }
+
+        .cat-image {
+            width: 400px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .ending-text {
+            font-size: 32px;
+            color: #333;
+            margin-top: 40px;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+
+        .ending-text.show {
+            animation: slideDown 2s ease-out forwards;
+        }
+
+        @keyframes slideDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feed-cat-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 20px;
+            margin-top: 30px;
+            opacity: 0;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .feed-cat-btn.show {
+            opacity: 1;
+        }
+
+        .feed-cat-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🎮 格子冒险游戏</h1>
+            <div class="game-info">
+                <span id="level-info">关卡: 卧室</span>
+                <span id="position-info">位置: (0, 0)</span>
+            </div>
+        </div>
+        
+        <div class="bubble-info" id="bubble-info">
+            <div>🫧 泡泡保护中</div>
+            <div>剩余步数: <span id="bubble-moves">5</span></div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="controls">
+            使用 ↑ ↓ ← → 方向键移动小人
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">欢迎</h2>
+            <p id="modal-text">提示内容</p>
+            <button class="modal-btn" onclick="closeModal()">开始游戏</button>
+        </div>
+    </div>
+
+    <!-- 添加结局场景 -->
+    <div class="ending-scene" id="ending-scene">
+        <!-- 图片链接改为本地路径 -->
+        <img src="./cat.png" alt="猫咪" class="cat-image">
+        <div class="ending-text" id="ending-text">你找到了你家的小猫！</div>
+        <button class="feed-cat-btn" id="feed-cat-btn" onclick="feedCat()">前往喂猫</button>
+    </div>
+
+    <script>
+        // 游戏状态
+        const game = {
+            level: 1,
+            playerX: 2,
+            playerY: 0,
+            grid: [],
+            bubbleMoves: 0,
+            mountainMoves: 0,
+            isDay: true,
+            obstacles: [],
+            ghosts: [],
+            bubbles: [],
+            holes: [],
+            trees: [],
+            modalQueue: [],
+            isShowingModal: false
+        };
+
+        // 初始化游戏
+        function initGame() {
+            createGrid();
+            loadLevel(1);
+            updateDisplay();
+            document.addEventListener('keydown', handleKeyPress);
+        }
+
+        // 创建格子
+        function createGrid() {
+            const gridElement = document.getElementById('grid');
+            gridElement.innerHTML = '';
+            game.grid = [];
+
+            for (let y = 0; y < 10; y++) {
+                game.grid[y] = [];
+                for (let x = 0; x < 10; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    gridElement.appendChild(cell);
+                    game.grid[y][x] = cell;
+                }
+            }
+        }
+
+        // 加载关卡
+        function loadLevel(level) {
+            game.level = level;
+            clearGrid();
+            document.getElementById('bubble-info').classList.remove('active');
+
+            switch(level) {
+                case 1:
+                    loadBedroom();
+                    const now = new Date();
+                    const hours = now.getHours();
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    const timeStr = `${hours}:${minutes}`;
+                    
+                    game.modalQueue = [
+                        { title: '🌅 早晨', text: `早上好？现在是${timeStr}，你似乎感觉到了哪里不对.......` },
+                        { title: '🐱 猫咪？', text: '你还没有喂猫！不对，你家猫呢！' },
+                        { title: '🚪 出发', text: '踏上旅途，寻找你的猫咪吧！' }
+                    ];
+                    showNextModal();
+                    break;
+                case 2:
+                    loadForest();
+                    showModal('🌲 森林', '小心黑洞！踩到黑洞会失败。树木无法通过。找到右下角的出口！');
+                    break;
+                case 3:
+                    loadOcean();
+                    showModal('🌊 海洋', '收集泡泡！每个泡泡可以让你移动5步。没有泡泡保护时移动会失败！');
+                    break;
+                case 4:
+                    loadMountain();
+                    showModal('⛰️ 登山', '每移动3步会切换日夜。夜晚时视野受限。小心鬼怪和障碍物！');
+                    break;
+            }
+
+            updateDisplay();
+        }
+
+        // 场景1: 卧室
+        function loadBedroom() {
+            game.playerX = 2;
+            game.playerY = 0;
+
+            // 床 (0,0) 到 (1,0)
+            game.grid[0][0].classList.add('bed');
+            game.grid[0][1].classList.add('bed');
+
+            // 门 (5,9)
+            game.grid[9][5].classList.add('door');
+
+            document.getElementById('level-info').textContent = '关卡: 1 - 卧室';
+        }
+
+        // 场景2: 森林
+        function loadForest() {
+            game.playerX = 0;
+            game.playerY = 0;
+            game.holes = [];
+            game.trees = [];
+
+            // 棋盘格背景
+            for (let y = 0; y < 10; y++) {
+                for (let x = 0; x < 10; x++) {
+                    if ((x + y) % 2 === 0) {
+                        game.grid[y][x].classList.add('forest-light');
+                    } else {
+                        game.grid[y][x].classList.add('forest-dark');
+                    }
+                }
+            }
+
+            for (let i = 0; i < 8; i++) {
+                let x, y;
+                do {
+                    x = Math.floor(Math.random() * 10);
+                    y = Math.floor(Math.random() * 10);
+                } while ((x === 0 && y === 0) || (x === 9 && y === 9) || game.holes.some(h => h.x === x && h.y === y));
+                
+                game.holes.push({x, y});
+                game.grid[y][x].classList.add('hole');
+            }
+
+            for (let i = 0; i < 12; i++) {
+                let x, y;
+                do {
+                    x = Math.floor(Math.random() * 10);
+                    y = Math.floor(Math.random() * 10);
+                } while ((x === 0 && y === 0) || (x === 9 && y === 9) || 
+                         game.holes.some(h => h.x === x && h.y === y) ||
+                         game.trees.some(t => t.x === x && t.y === y));
+                
+                game.trees.push({x, y});
+                game.grid[y][x].classList.add('tree');
+            }
+
+            // 出口
+            game.grid[9][9].classList.add('exit');
+
+            document.getElementById('level-info').textContent = '关卡: 2 - 森林';
+        }
+
+        // 场景3: 海洋
+        function loadOcean() {
+            game.playerX = 0;
+            game.playerY = 0;
+            game.bubbleMoves = 5;
+            game.bubbles = [];
+
+            // 蓝色背景
+            for (let y = 0; y < 10; y++) {
+                for (let x = 0; x < 10; x++) {
+                    game.grid[y][x].classList.add('ocean');
+                }
+            }
+
+            // 随机生成15个泡泡
+            for (let i = 0; i < 15; i++) {
+                let x, y;
+                do {
+                    x = Math.floor(Math.random() * 10);
+                    y = Math.floor(Math.random() * 10);
+                } while ((x === 0 && y === 0) || (x === 9 && y === 9) || 
+                         game.bubbles.some(b => b.x === x && b.y === y));
+                
+                game.bubbles.push({x, y});
+                game.grid[y][x].classList.add('bubble');
+            }
+
+            // 出口
+            game.grid[9][9].classList.add('exit');
+
+            document.getElementById('bubble-info').classList.add('active');
+            document.getElementById('bubble-moves').textContent = game.bubbleMoves;
+
+            document.getElementById('level-info').textContent = '关卡: 3 - 海洋';
+        }
+
+        // 场景4: 登山
+        function loadMountain() {
+            game.playerX = 0;
+            game.playerY = 0;
+            game.mountainMoves = 0;
+            game.isDay = true;
+            game.obstacles = [];
+            game.ghosts = [];
+
+            // 山地背景
+            for (let y = 0; y < 10; y++) {
+                for (let x = 0; x < 10; x++) {
+                    game.grid[y][x].classList.add('mountain');
+                }
+            }
+
+            // 随机生成障碍物
+            for (let i = 0; i < 10; i++) {
+                let x, y;
+                do {
+                    x = Math.floor(Math.random() * 10);
+                    y = Math.floor(Math.random() * 10);
+                } while ((x === 0 && y === 0) || (x === 9 && y === 9) || 
+                         game.obstacles.some(o => o.x === x && o.y === y));
+                
+                game.obstacles.push({x, y});
+                game.grid[y][x].classList.add('obstacle');
+            }
+
+            // 随机生成鬼怪
+            for (let i = 0; i < 5; i++) {
+                let x, y;
+                do {
+                    x = Math.floor(Math.random() * 10);
+                    y = Math.floor(Math.random() * 10);
+                } while ((x === 0 && y === 0) || (x === 9 && y === 9) || 
+                         game.obstacles.some(o => o.x === x && o.y === y) ||
+                         game.ghosts.some(g => g.x === x && g.y === y));
+                
+                game.ghosts.push({x, y});
+                game.grid[y][x].classList.add('ghost');
+            }
+
+            // 出口
+            game.grid[9][9].classList.add('exit');
+
+            document.getElementById('level-info').textContent = '关卡: 4 - 登山';
+        }
+
+        // 清空格子
+        function clearGrid() {
+            for (let y = 0; y < 10; y++) {
+                for (let x = 0; x < 10; x++) {
+                    game.grid[y][x].className = 'cell';
+                }
+            }
+        }
+
+        // 键盘控制
+        function handleKeyPress(e) {
+            let newX = game.playerX;
+            let newY = game.playerY;
+
+            switch(e.key) {
+                case 'ArrowUp':
+                    newY = Math.max(0, game.playerY - 1);
+                    e.preventDefault();
+                    break;
+                case 'ArrowDown':
+                    newY = Math.min(9, game.playerY + 1);
+                    e.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                    newX = Math.max(0, game.playerX - 1);
+                    e.preventDefault();
+                    break;
+                case 'ArrowRight':
+                    newX = Math.min(9, game.playerX + 1);
+                    e.preventDefault();
+                    break;
+                default:
+                    return;
+            }
+
+            if (newX !== game.playerX || newY !== game.playerY) {
+                movePlayer(newX, newY);
+            }
+        }
+
+        // 移动玩家
+        function movePlayer(newX, newY) {
+            // 检查碰撞
+            if (!canMove(newX, newY)) {
+                return;
+            }
+
+            game.playerX = newX;
+            game.playerY = newY;
+
+            // 关卡特定逻辑
+            handleLevelLogic(newX, newY);
+
+            updateDisplay();
+        }
+
+        // 检查是否可以移动
+        function canMove(x, y) {
+            if (game.level === 2) {
+                if (game.trees.some(t => t.x === x && t.y === y)) {
+                    showModal('🌲 障碍', '前方有树木，无法通过！');
+                    return false;
+                }
+            }
+
+            if (game.level === 4) {
+                if (game.obstacles.some(o => o.x === x && o.y === y)) {
+                    showModal('🪨 障碍', '前方有岩石，无法通过！');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // 处理关卡逻辑
+        function handleLevelLogic(x, y) {
+            switch(game.level) {
+                case 1:
+                    if (x === 5 && y === 9) {
+                        setTimeout(() => loadLevel(2), 300);
+                    }
+                    break;
+
+                case 2:
+                    if (game.holes.some(h => h.x === x && h.y === y)) {
+                        showModal('💀 失败', '你掉进了黑洞！返回卧室。');
+                        setTimeout(() => loadLevel(1), 1500);
+                        return;
+                    }
+                    if (x === 9 && y === 9) {
+                        setTimeout(() => loadLevel(3), 300);
+                    }
+                    break;
+
+                case 3:
+                    const bubbleIndex = game.bubbles.findIndex(b => b.x === x && b.y === y);
+                    if (bubbleIndex !== -1) {
+                        game.bubbleMoves = 5;
+                        game.bubbles.splice(bubbleIndex, 1);
+                        game.grid[y][x].classList.remove('bubble');
+                        document.getElementById('bubble-info').classList.add('active');
+                    }
+
+                    if (game.bubbleMoves > 0) {
+                        game.bubbleMoves--;
+                        document.getElementById('bubble-moves').textContent = game.bubbleMoves;
+                        
+                        if (game.bubbleMoves === 0) {
+                            document.getElementById('bubble-info').classList.remove('active');
+                        }
+                    } else if (!(x === 0 && y === 0)) {
+                        showModal('💀 失败', '没有泡泡保护！返回卧室。');
+                        setTimeout(() => loadLevel(1), 1500);
+                        return;
+                    }
+
+                    if (x === 9 && y === 9 && game.bubbleMoves > 0) {
+                        setTimeout(() => loadLevel(4), 300);
+                    }
+                    break;
+
+                case 4:
+                    if (game.ghosts.some(g => g.x === x && g.y === y)) {
+                        showModal('💀 失败', '你遇到了鬼怪！返回卧室。');
+                        setTimeout(() => loadLevel(1), 1500);
+                        return;
+                    }
+
+                    game.mountainMoves++;
+                    if (game.mountainMoves % 3 === 0) {
+                        game.isDay = !game.isDay;
+                        updateMountainVisibility();
+                    }
+
+                    if (x === 9 && y === 9) {
+                        setTimeout(() => showEndingScene(), 300);
+                    }
+                    break;
+            }
+        }
+
+        // 更新登山场景的可见性
+        function updateMountainVisibility() {
+            for (let y = 0; y < 10; y++) {
+                for (let x = 0; x < 10; x++) {
+                    const cell = game.grid[y][x];
+                    const isObstacle = game.obstacles.some(o => o.x === x && o.y === y);
+                    const isGhost = game.ghosts.some(g => g.x === x && g.y === y);
+                    
+                    if (!game.isDay && !(x === game.playerX && y === game.playerY)) {
+                        cell.classList.remove('mountain');
+                        cell.classList.add('mountain-night');
+                        
+                        if (isObstacle) {
+                            cell.classList.add('night');
+                        }
+                        if (isGhost) {
+                            cell.classList.add('night');
+                        }
+                    } else if (game.isDay) {
+                        cell.classList.remove('mountain-night', 'night');
+                        if (!isObstacle && !isGhost && !cell.classList.contains('exit')) {
+                            cell.classList.add('mountain');
+                        }
+                    }
+                }
+            }
+            if (!game.isDay) {
+                game.grid[game.playerY][game.playerX].classList.remove('mountain-night');
+                game.grid[game.playerY][game.playerX].classList.add('mountain');
+            }
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            document.querySelectorAll('.player').forEach(p => p.remove());
+
+            const playerCell = game.grid[game.playerY][game.playerX];
+            const player = document.createElement('div');
+            player.className = 'player';
+            playerCell.appendChild(player);
+
+            document.getElementById('position-info').textContent = `位置: (${game.playerX}, ${game.playerY})`;
+        }
+
+        // 显示提示窗口
+        function showModal(title, text) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-text').textContent = text;
+            document.getElementById('modal').classList.add('active');
+            game.isShowingModal = true;
+        }
+
+        function showNextModal() {
+            if (game.modalQueue.length > 0) {
+                const modal = game.modalQueue.shift();
+                showModal(modal.title, modal.text);
+            }
+        }
+
+        // 关闭提示窗口
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            game.isShowingModal = false;
+            
+            if (game.modalQueue.length > 0) {
+                setTimeout(() => showNextModal(), 300);
+            }
+        }
+
+        function showEndingScene() {
+            document.getElementById('ending-scene').classList.add('active');
+            
+            setTimeout(() => {
+                document.getElementById('ending-text').classList.add('show');
+            }, 1000);
+            
+            setTimeout(() => {
+                document.getElementById('feed-cat-btn').classList.add('show');
+            }, 3000);
+        }
+
+        function feedCat() {
+           
+            window.location.href = './pixel-cat-care/index.html';
+        }
+
+        // 启动游戏
+        initGame();
+    </script>
+</body>
+</html>
