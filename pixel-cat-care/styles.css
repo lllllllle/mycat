@@ -303,8 +303,8 @@ body {
 
 .stat-value {
   font-size: 14px;
-  width: 80px;
-  text-align: right;
+ 
+  text-align: left;
   font-weight: 600;
 }
 
