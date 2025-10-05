@@ -4,7 +4,7 @@ class CatChat {
       this.inputElement = document.getElementById("chat-input")
       this.sendButton = document.getElementById("send-btn")
   
-      this.apiUrl = "https://spark-api-open.xf-yun.com/v1/chat/completions"
+      this.apiUrl = "http://localhost:3000/api/chat"
       this.apiKey = "wOXvhtYLiFuxezWqdRlR:bUGDDsaBJqsVYhFOSibD"
       this.appId = "84c87cc1"
   
