@@ -75,8 +75,8 @@ class CatChat {
         ],
         max_tokens: 4096, // Increased from 100 to 4096
         top_k: 4, // Added top_k parameter
-        temperature: 0.5, // Changed from 0.8 to 0.5
-        stream: true,
+        temperature: 0.8, // Changed from 0.8 to 0.5
+        stream: false,
       }
   
       const response = await fetch(this.apiUrl, {
