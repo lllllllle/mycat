@@ -52,57 +52,39 @@ class CatChat {
     }
   
     async callChatAPI(userMessage) {
-      // Add user message to history
+      // 添加用户消息到本地历史
       this.conversationHistory.push({
         role: "user",
         content: userMessage,
-      })
-  
-      // Keep only last 10 messages to avoid token limit
-      if (this.conversationHistory.length > 10) {
-        this.conversationHistory = this.conversationHistory.slice(-10)
-      }
-  
-      const requestBody = {
-        model: "lite", // Changed from "generalv3.5" to "lite"
-        messages: [
-          {
-            role: "system",
-            content:
-              '你是一只可爱的小猫咪，你现在在和"老大"对话。你喜欢用"喵"结尾说话，性格活泼可爱，喜欢撒娇。你会用简短、可爱的语言回答问题，偶尔会提到猫咪喜欢的事物（如蛋糕、玩具、晒太阳等）。用"窝"或"咪"替代"我","老大"或"泥"替代"你",用"水饺"替代"睡觉",用"素"代替"是".回答要简洁。',
-          },
-          ...this.conversationHistory,
-        ],
-        max_tokens: 4096, // Increased from 100 to 4096
-        top_k: 4, // Added top_k parameter
-        temperature: 0.8, // Changed from 0.8 to 0.5
-        stream: false,
-      }
-  
+      });
+    
+      // 保留最近 10 条消息
+      const messagesToSend = this.conversationHistory.slice(-10);
+    
       const response = await fetch(this.apiUrl, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestBody),
-      })
-  
+        body: JSON.stringify({ messages: messagesToSend }),
+      });
+    
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`)
+        throw new Error(`API request failed: ${response.status}`);
       }
-  
-      const data = await response.json()
-      const botMessage = data.choices[0].message.content
-  
-      // Add bot response to history
+    
+      const data = await response.json();
+      const botMessage = data.choices[0].message.content;
+    
+      // 添加 AI 回复到本地历史
       this.conversationHistory.push({
         role: "assistant",
         content: botMessage,
-      })
-  
-      return botMessage
+      });
+    
+      return botMessage;
     }
+
   
     addMessage(text, sender) {
       const messageDiv = document.createElement("div")
