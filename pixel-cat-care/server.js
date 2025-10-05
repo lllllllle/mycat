@@ -1,10 +1,10 @@
-import express from "express"
-import fetch from "node-fetch"
-import cors from "cors"
+const express = require("express");
+const fetch = require("node-fetch");
+const cors = require("cors");
 
-const app = express()
-app.use(cors())
-app.use(express.json())
+const app = express();
+app.use(cors());
+app.use(express.json());
 
 app.post("/api/chat", async (req, res) => {
   try {
@@ -15,14 +15,14 @@ app.post("/api/chat", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(req.body),
-    })
+    });
 
-    const data = await response.text()
-    res.send(data)
+    const data = await response.text();
+    res.send(data);
   } catch (err) {
-    console.error("Proxy error:", err)
-    res.status(500).send({ error: "Proxy request failed" })
+    console.error("Proxy error:", err);
+    res.status(500).send({ error: "Proxy request failed" });
   }
-})
+});
 
-app.listen(3000, () => console.log("Proxy running on http://localhost:3000"))
+app.listen(3000, () => console.log("✅ Proxy running on http://localhost:3000"));
