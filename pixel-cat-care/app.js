@@ -204,11 +204,11 @@ class CatCareApp {
         "咪还以为老大不要笨笨猫了……",
         "咪就这样，等待……",
       ]
-    } else if (hoursDiff > 12) {
+    } else if (24 >= hoursDiff > 12) {
       speeches = ["老大回来了喵！", "好无聊——来陪窝玩——", "等的好困……要水饺……"]
-    } else if (hoursDiff > 6) {
+    } else if (12 >= hoursDiff > 6) {
       speeches = ["巴巴拉巴巴！小咪之家，喜欢您来！", "咪，刚好醒来！", "老大，来陪窝玩喵！"]
-    } else if (hoursDiff > 1) {
+    } else if (6 >= hoursDiff > 1) {
       speeches = ["老大来是想欣赏豆泥吗", "呼——呼——（水饺中）", "陪窝玩！"]
     } else {
       speeches = ["老大来了喵！", "陪窝玩！", "（哼歌）", "咪咪喵喵，喵喵咪咪~"]
